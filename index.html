@@ -1,11 +1,377 @@
 
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Fahad Ansari - SEO Expert</title>
-</head>
-<body>
-  <h1>Welcome to my SEO website</h1>
-  <p>I help businesses rank higher on Google and AI search.</p>
-</body>
-</html>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--color-background-tertiary);color:var(--color-text-primary)}
+.app{display:flex;flex-direction:column;min-height:600px}
+.topbar{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:12px 20px;display:flex;align-items:center;gap:12px}
+.topbar h1{font-size:16px;font-weight:500;flex:none}
+.url-input{flex:1;height:34px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:0 12px;font-size:13px;background:var(--color-background-secondary);color:var(--color-text-primary)}
+.analyze-btn{height:34px;padding:0 16px;background:var(--color-background-info);color:var(--color-text-info);border:0.5px solid var(--color-border-info);border-radius:var(--border-radius-md);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.analyze-btn:hover{opacity:0.85}
+.analyze-btn:disabled{opacity:0.5;cursor:not-allowed}
+.tabs{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:0 20px;display:flex;gap:0}
+.tab{padding:10px 16px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:var(--color-text-secondary)}
+.tab.active{border-bottom-color:#378ADD;color:var(--color-text-info);font-weight:500}
+.main{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--color-border-tertiary);flex:1}
+.panel{background:var(--color-background-primary);padding:0}
+.panel-header{padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between}
+.panel-title{font-size:14px;font-weight:500}
+.panel-meta{font-size:12px;color:var(--color-text-secondary)}
+.kw-list{overflow-y:auto;max-height:420px}
+.kw-row{display:grid;grid-template-columns:1fr 52px 52px 60px;gap:8px;padding:9px 16px;border-bottom:0.5px solid var(--color-border-tertiary);align-items:center;font-size:13px}
+.kw-row:hover{background:var(--color-background-secondary)}
+.kw-name{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kw-col{font-size:12px;color:var(--color-text-secondary);text-align:center}
+.col-hdr{font-size:11px;color:var(--color-text-tertiary);text-align:center}
+.rank-badge{display:inline-flex;align-items:center;justify-content:center;width:28px;height:20px;border-radius:4px;font-size:11px;font-weight:500}
+.rank-1{background:#EAF3DE;color:#3B6D11}
+.rank-top5{background:#E6F1FB;color:#185FA5}
+.rank-top20{background:#FAEEDA;color:#854F0B}
+.rank-low{background:#F1EFE8;color:#5F5E5A}
+.llm-section{padding:12px 16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.llm-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em}
+.llm-kw-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:13px}
+.llm-kw-row:last-child{border:none}
+.llm-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
+.cited{background:#E1F5EE;color:#0F6E56}
+.mentioned{background:#E6F1FB;color:#185FA5}
+.not-found{background:#F1EFE8;color:#5F5E5A}
+.llm-dot{width:8px;height:8px;border-radius:50%;flex:none}
+.dot-chatgpt{background:#10a37f}
+.dot-gemini{background:#4285f4}
+.dot-perplexity{background:#8b5cf6}
+.dot-claude{background:#d97706}
+.dot-grok{background:#1a1a1a}
+.summary-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--color-border-tertiary)}
+.sum-card{background:var(--color-background-primary);padding:12px 16px}
+.sum-num{font-size:22px;font-weight:500;margin-bottom:2px}
+.sum-lbl{font-size:11px;color:var(--color-text-secondary)}
+.empty{padding:40px 16px;text-align:center;color:var(--color-text-tertiary);font-size:13px}
+.loading-row{padding:9px 16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.skeleton{background:var(--color-background-secondary);border-radius:4px;height:12px;animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.filter-bar{padding:8px 16px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.filter-chip{padding:3px 10px;border-radius:10px;font-size:11px;cursor:pointer;border:0.5px solid var(--color-border-secondary);color:var(--color-text-secondary);background:var(--color-background-primary)}
+.filter-chip.active{background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)}
+.progress-wrap{background:var(--color-background-secondary);border-radius:3px;height:5px;flex:1;max-width:80px;overflow:hidden}
+.progress-bar{height:100%;border-radius:3px;background:#378ADD}
+.vis-score{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--color-text-secondary)}
+</style>
+
+<h2 class="sr-only">SEO and LLM keyword visibility dashboard</h2>
+
+<div class="app">
+  <div class="topbar">
+    <h1>KeywordLens</h1>
+    <input class="url-input" id="urlInput" type="text" placeholder="Enter your website URL e.g. example.com" value="" />
+    <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()">Analyze ↗</button>
+  </div>
+
+  <div id="summaryBar" style="display:none">
+    <div class="summary-bar">
+      <div class="sum-card">
+        <div class="sum-num" id="s-total">0</div>
+        <div class="sum-lbl">Keywords ranking</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-num" id="s-top10">0</div>
+        <div class="sum-lbl">Top 10 positions</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-num" id="s-llm">0</div>
+        <div class="sum-lbl">LLM citations found</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-num" id="s-sov">0%</div>
+        <div class="sum-lbl">Avg LLM share of voice</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="setTab(0,this)">Overview</div>
+    <div class="tab" onclick="setTab(1,this)">SEO keywords</div>
+    <div class="tab" onclick="setTab(2,this)">LLM visibility</div>
+    <div class="tab" onclick="setTab(3,this)">Competitors</div>
+  </div>
+
+  <div id="panelArea" class="main">
+    <div class="panel" style="grid-column:1/-1">
+      <div class="empty" id="emptyState">
+        Enter your website URL above and click Analyze to see your SEO rankings and LLM keyword visibility.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const MOCK_KEYWORDS = [
+  {kw:"seo tools comparison",pos:3,vol:8200,diff:62,pages:["/blog/seo-tools"],chatgpt:"cited",gemini:"mentioned",perplexity:"cited",claude:"not_found",grok:"mentioned"},
+  {kw:"best keyword research tool",pos:7,vol:14000,diff:71,pages:["/tools/keyword"],chatgpt:"mentioned",gemini:"cited",perplexity:"mentioned",claude:"mentioned",grok:"not_found"},
+  {kw:"ai overview tracking",pos:11,vol:3100,diff:48,pages:["/features/ai"],chatgpt:"cited",gemini:"cited",perplexity:"cited",claude:"cited",grok:"cited"},
+  {kw:"llm seo visibility",pos:2,vol:1800,diff:34,pages:["/blog/llm-seo"],chatgpt:"cited",gemini:"mentioned",perplexity:"cited",claude:"not_found",grok:"not_found"},
+  {kw:"google ai overview monitor",pos:5,vol:5600,diff:55,pages:["/features"],chatgpt:"not_found",gemini:"cited",perplexity:"mentioned",claude:"not_found",grok:"not_found"},
+  {kw:"rank tracker software",pos:18,vol:22000,diff:79,pages:["/pricing"],chatgpt:"not_found",gemini:"not_found",perplexity:"mentioned",claude:"not_found",grok:"not_found"},
+  {kw:"chatgpt brand visibility",pos:1,vol:2400,diff:41,pages:["/blog/chatgpt"],chatgpt:"cited",gemini:"cited",perplexity:"cited",claude:"cited",grok:"mentioned"},
+  {kw:"seo dashboard 2025",pos:9,vol:6700,diff:58,pages:["/"],chatgpt:"mentioned",gemini:"not_found",perplexity:"mentioned",claude:"not_found",grok:"not_found"},
+  {kw:"perplexity seo tracking",pos:4,vol:1200,diff:29,pages:["/features/ai"],chatgpt:"mentioned",gemini:"not_found",perplexity:"cited",claude:"not_found",grok:"not_found"},
+  {kw:"generative engine optimization",pos:6,vol:3800,diff:52,pages:["/blog/geo"],chatgpt:"cited",gemini:"cited",perplexity:"cited",claude:"mentioned",grok:"mentioned"},
+];
+
+const LLMS = [
+  {id:"chatgpt",label:"ChatGPT",cls:"dot-chatgpt"},
+  {id:"gemini",label:"Gemini",cls:"dot-gemini"},
+  {id:"perplexity",label:"Perplexity",cls:"dot-perplexity"},
+  {id:"claude",label:"Claude",cls:"dot-claude"},
+  {id:"grok",label:"Grok",cls:"dot-grok"},
+];
+
+let currentTab = 0;
+let loaded = false;
+let seoFilter = "all";
+let llmFilter = "all";
+
+function setTab(idx, el) {
+  currentTab = idx;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  if (loaded) renderTab();
+}
+
+function rankClass(pos) {
+  if (pos === 1) return 'rank-1';
+  if (pos <= 5) return 'rank-top5';
+  if (pos <= 10) return 'rank-top20';
+  return 'rank-low';
+}
+
+function badgeCls(status) {
+  if (status === 'cited') return 'cited';
+  if (status === 'mentioned') return 'mentioned';
+  return 'not-found';
+}
+function badgeLabel(status) {
+  if (status === 'cited') return 'Cited';
+  if (status === 'mentioned') return 'Mentioned';
+  return '—';
+}
+
+function llmScore(kw) {
+  let score = 0;
+  LLMS.forEach(l => { if (kw[l.id] === 'cited') score += 2; else if (kw[l.id] === 'mentioned') score += 1; });
+  return score;
+}
+
+function runAnalysis() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) { document.getElementById('urlInput').style.borderColor='var(--color-border-danger)'; setTimeout(()=>document.getElementById('urlInput').style.borderColor='',1200); return; }
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById('analyzeBtn').textContent = 'Analyzing…';
+  document.getElementById('emptyState') && (document.getElementById('emptyState').style.display='none');
+  showLoading();
+  setTimeout(() => {
+    loaded = true;
+    document.getElementById('analyzeBtn').disabled = false;
+    document.getElementById('analyzeBtn').textContent = 'Analyze ↗';
+    document.getElementById('summaryBar').style.display = 'block';
+    updateSummary();
+    renderTab();
+  }, 2200);
+}
+
+function showLoading() {
+  const pa = document.getElementById('panelArea');
+  pa.style.gridTemplateColumns = '1fr 1fr';
+  pa.innerHTML = `<div class="panel"><div class="panel-header"><span class="panel-title">SEO keywords</span></div>${[...Array(7)].map(()=>`<div class="loading-row"><div class="skeleton" style="width:${60+Math.random()*30|0}%;margin-bottom:6px"></div><div class="skeleton" style="width:30%"></div></div>`).join('')}</div><div class="panel"><div class="panel-header"><span class="panel-title">LLM visibility</span></div>${[...Array(5)].map(()=>`<div class="loading-row"><div class="skeleton" style="width:70%;margin-bottom:6px"></div><div class="skeleton" style="width:50%"></div></div>`).join('')}</div>`;
+}
+
+function updateSummary() {
+  const top10 = MOCK_KEYWORDS.filter(k=>k.pos<=10).length;
+  const cited = MOCK_KEYWORDS.filter(k=>LLMS.some(l=>k[l.id]==='cited')).length;
+  const sovTotal = MOCK_KEYWORDS.reduce((a,k)=>a+llmScore(k),0);
+  const sovMax = MOCK_KEYWORDS.length * LLMS.length * 2;
+  document.getElementById('s-total').textContent = MOCK_KEYWORDS.length;
+  document.getElementById('s-top10').textContent = top10;
+  document.getElementById('s-llm').textContent = cited;
+  document.getElementById('s-sov').textContent = Math.round(sovTotal/sovMax*100)+'%';
+}
+
+function renderTab() {
+  if (currentTab === 0) renderOverview();
+  else if (currentTab === 1) renderSEO();
+  else if (currentTab === 2) renderLLM();
+  else renderCompetitors();
+}
+
+function renderOverview() {
+  const pa = document.getElementById('panelArea');
+  pa.style.gridTemplateColumns = '1fr 1fr';
+  const seoRows = MOCK_KEYWORDS.slice(0,6).map(k=>`
+    <div class="kw-row">
+      <div class="kw-name">${k.kw}</div>
+      <div class="kw-col"><span class="rank-badge ${rankClass(k.pos)}">#${k.pos}</span></div>
+      <div class="kw-col">${(k.vol/1000).toFixed(1)}k</div>
+      <div class="kw-col" style="font-size:11px;color:var(--color-text-secondary)">${k.diff}</div>
+    </div>`).join('');
+
+  const llmRows = MOCK_KEYWORDS.slice(0,6).map(k=>`
+    <div class="kw-row" style="grid-template-columns:1fr ${LLMS.map(()=>'36px').join(' ')}">
+      <div class="kw-name">${k.kw}</div>
+      ${LLMS.map(l=>`<div style="text-align:center"><span style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${l.id==='chatgpt'?'#10a37f':l.id==='gemini'?'#4285f4':l.id==='perplexity'?'#8b5cf6':l.id==='claude'?'#d97706':'#888'};opacity:${k[l.id]==='cited'?1:k[l.id]==='mentioned'?0.45:0.12}"></span></div>`).join('')}
+    </div>`).join('');
+
+  pa.innerHTML = `
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Top SEO keywords</span>
+        <span class="panel-meta">${MOCK_KEYWORDS.length} total</span>
+      </div>
+      <div class="kw-row" style="padding:6px 16px">
+        <div class="kw-col" style="text-align:left;color:var(--color-text-tertiary);font-size:11px">Keyword</div>
+        <div class="col-hdr">Rank</div><div class="col-hdr">Vol</div><div class="col-hdr">KD</div>
+      </div>
+      <div class="kw-list">${seoRows}</div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">LLM visibility heatmap</span>
+        <span class="panel-meta" style="display:flex;gap:8px;align-items:center">
+          ${LLMS.map(l=>`<span style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--color-text-secondary)"><span style="width:7px;height:7px;border-radius:50%;background:${l.id==='chatgpt'?'#10a37f':l.id==='gemini'?'#4285f4':l.id==='perplexity'?'#8b5cf6':l.id==='claude'?'#d97706':'#888'};display:inline-block"></span>${l.label}</span>`).join('')}
+        </span>
+      </div>
+      <div class="kw-row" style="padding:6px 16px;grid-template-columns:1fr ${LLMS.map(()=>'36px').join(' ')}">
+        <div style="font-size:11px;color:var(--color-text-tertiary)">Keyword</div>
+        ${LLMS.map(l=>`<div style="text-align:center;font-size:10px;color:var(--color-text-tertiary)">${l.label.slice(0,3)}</div>`).join('')}
+      </div>
+      <div class="kw-list">${llmRows}</div>
+    </div>`;
+}
+
+function renderSEO() {
+  const pa = document.getElementById('panelArea');
+  pa.style.gridTemplateColumns = '1fr';
+  const filters = ['all','top1','top5','top10','top20'];
+  const labels = {all:'All',top1:'#1',top5:'Top 5',top10:'Top 10',top20:'Top 20'};
+  const filtered = MOCK_KEYWORDS.filter(k=>{
+    if(seoFilter==='all') return true;
+    if(seoFilter==='top1') return k.pos===1;
+    if(seoFilter==='top5') return k.pos<=5;
+    if(seoFilter==='top10') return k.pos<=10;
+    if(seoFilter==='top20') return k.pos<=20;
+    return true;
+  });
+  const rows = filtered.map(k=>`
+    <div class="kw-row" style="grid-template-columns:1fr 52px 60px 52px 90px">
+      <div>
+        <div class="kw-name">${k.kw}</div>
+        <div style="font-size:11px;color:var(--color-text-tertiary)">${k.pages[0]}</div>
+      </div>
+      <div class="kw-col"><span class="rank-badge ${rankClass(k.pos)}">#${k.pos}</span></div>
+      <div class="kw-col">${k.vol.toLocaleString()}</div>
+      <div class="kw-col">${k.diff}</div>
+      <div class="kw-col">
+        <div class="vis-score">
+          <div class="progress-wrap"><div class="progress-bar" style="width:${Math.round(llmScore(k)/10*100)}%"></div></div>
+          <span>${Math.round(llmScore(k)/10*100)}%</span>
+        </div>
+      </div>
+    </div>`).join('');
+
+  pa.innerHTML = `<div class="panel" style="grid-column:1/-1">
+    <div class="panel-header">
+      <span class="panel-title">SEO keyword rankings</span>
+      <span class="panel-meta">${filtered.length} keywords</span>
+    </div>
+    <div class="filter-bar">
+      <span style="font-size:11px;color:var(--color-text-secondary)">Filter:</span>
+      ${filters.map(f=>`<span class="filter-chip${seoFilter===f?' active':''}" onclick="seoFilter='${f}';renderSEO()">${labels[f]}</span>`).join('')}
+    </div>
+    <div class="kw-row" style="padding:6px 16px;grid-template-columns:1fr 52px 60px 52px 90px">
+      <div style="font-size:11px;color:var(--color-text-tertiary)">Keyword / URL</div>
+      <div class="col-hdr">Rank</div>
+      <div class="col-hdr">Volume</div>
+      <div class="col-hdr">KD</div>
+      <div class="col-hdr">LLM score</div>
+    </div>
+    <div class="kw-list">${rows}</div>
+  </div>`;
+}
+
+function renderLLM() {
+  const pa = document.getElementById('panelArea');
+  pa.style.gridTemplateColumns = '1fr';
+
+  const llmSections = LLMS.map(l=>{
+    const filter = llmFilter;
+    const kws = MOCK_KEYWORDS.filter(k=> filter==='all' || k[l.id]===filter);
+    const cited = MOCK_KEYWORDS.filter(k=>k[l.id]==='cited').length;
+    const mentioned = MOCK_KEYWORDS.filter(k=>k[l.id]==='mentioned').length;
+    return `<div class="llm-section">
+      <div class="llm-label" style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+        <span class="llm-dot ${l.cls}"></span> ${l.label}
+        <span style="margin-left:auto;font-size:11px;font-weight:400;color:var(--color-text-secondary)">
+          <span style="color:#0F6E56">${cited} cited</span> · <span style="color:#185FA5">${mentioned} mentioned</span>
+        </span>
+      </div>
+      ${kws.map(k=>`<div class="llm-kw-row">
+        <span>${k.kw}</span>
+        <span class="llm-badge ${badgeCls(k[l.id])}">${badgeLabel(k[l.id])}</span>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+
+  pa.innerHTML = `<div class="panel" style="grid-column:1/-1">
+    <div class="panel-header">
+      <span class="panel-title">LLM keyword visibility</span>
+      <span class="panel-meta">Across ${LLMS.length} AI platforms</span>
+    </div>
+    <div class="filter-bar">
+      <span style="font-size:11px;color:var(--color-text-secondary)">Show:</span>
+      ${[['all','All'],['cited','Cited only'],['mentioned','Mentioned'],['not_found','Not found']].map(([v,l])=>`<span class="filter-chip${llmFilter===v?' active':''}" onclick="llmFilter='${v}';renderLLM()">${l}</span>`).join('')}
+    </div>
+    <div class="kw-list" style="max-height:none">${llmSections}</div>
+  </div>`;
+}
+
+function renderCompetitors() {
+  const pa = document.getElementById('panelArea');
+  pa.style.gridTemplateColumns = '1fr';
+  const comps = [
+    {name:"ahrefs.com",sov:68,keywords:142,cited:38},
+    {name:"semrush.com",sov:74,keywords:198,cited:51},
+    {name:"moz.com",sov:45,keywords:89,cited:22},
+    {name:"your site",sov:Math.round(MOCK_KEYWORDS.reduce((a,k)=>a+llmScore(k),0)/MOCK_KEYWORDS.length/10*100),keywords:MOCK_KEYWORDS.length,cited:MOCK_KEYWORDS.filter(k=>LLMS.some(l=>k[l.id]==='cited')).length,isYou:true},
+  ].sort((a,b)=>b.sov-a.sov);
+
+  const rows = comps.map(c=>`<div class="kw-row" style="grid-template-columns:1fr 70px 70px 120px;${c.isYou?'background:var(--color-background-info);':''}">
+    <div class="kw-name" style="${c.isYou?'color:var(--color-text-info);font-weight:500':''}">
+      ${c.isYou?'★ ':''} ${c.name}
+    </div>
+    <div class="kw-col">${c.keywords}</div>
+    <div class="kw-col">${c.cited}</div>
+    <div class="kw-col">
+      <div class="vis-score">
+        <div class="progress-wrap"><div class="progress-bar" style="width:${c.sov}%;background:${c.isYou?'#185FA5':'#378ADD'}"></div></div>
+        <span>${c.sov}%</span>
+      </div>
+    </div>
+  </div>`).join('');
+
+  pa.innerHTML = `<div class="panel" style="grid-column:1/-1">
+    <div class="panel-header">
+      <span class="panel-title">Competitor LLM share of voice</span>
+      <span class="panel-meta">vs 3 competitors</span>
+    </div>
+    <div class="kw-row" style="padding:6px 16px;grid-template-columns:1fr 70px 70px 120px">
+      <div style="font-size:11px;color:var(--color-text-tertiary)">Domain</div>
+      <div class="col-hdr">Keywords</div>
+      <div class="col-hdr">LLM cited</div>
+      <div class="col-hdr">Share of voice</div>
+    </div>
+    <div class="kw-list">${rows}</div>
+    <div style="padding:12px 16px;border-top:0.5px solid var(--color-border-tertiary)">
+      <button class="analyze-btn" style="font-size:12px;height:28px;padding:0 12px" onclick="sendPrompt('How can I improve my LLM share of voice compared to my competitors?')">Get improvement recommendations ↗</button>
+    </div>
+  </div>`;
+}
+</script>
